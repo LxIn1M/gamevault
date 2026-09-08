@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GameVault</title>
+</head>
+
+<body>
+    <h1>GameVault</h1>
+    <p>{{ username }}'s gaming library.</p>
+    <p>Added games: {{ games_count }}.</p>
+
+    <h2>Library</h2>
+
+    <ul id="games_list">
+    {% for entry in entries %}
+        {% if entry.status == "completed" %}
+            <li>{{ entry.game.title }} | Status: ✅ Completed | Hours: {{ entry.hours }} | Rating: {{ entry.rating }}</li>
+        {% elif entry.status == "playing" %}
+            <li>{{ entry.game.title }} | Status: 🟢 Playing | Hours: {{ entry.hours }} | Rating: {{ entry.rating }}</li>
+        {% else %}
+            <li>{{ entry.game.title }} | Status: {{ entry.get_status_display }} | Hours: {{ entry.hours }} | Rating: {{ entry.rating }}</li>
+        {% endif %}
+    {% endfor %}
+    </ul>
+</body>
+</html>
+```
