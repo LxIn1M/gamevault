@@ -23,6 +23,11 @@
         {% endif %}
     {% endfor %}
     </ul>
+    <a href="{% url 'add_game' %}">Add game</a>
+    <form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+</form>
 </body>
 </html>
 ```
