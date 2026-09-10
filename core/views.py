@@ -1,9 +1,14 @@
 from django.shortcuts import render
-from .models import LibraryEntry
+from .models import LibraryEntry, Game
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect
 from .forms import LibraryEntryForm, LibraryEntryUpdateForm
+import os
+import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 @login_required
 def home(request):
@@ -91,3 +96,67 @@ def delete_entry(request, entry_id):
         "core/delete_entry.html",
         {"entry": entry},
     )
+    
+@login_required
+def search_games(request):
+    query = request.GET.get("q", "")
+    
+    games = []
+    
+    if query:
+        api_key = os.getenv("RAWG_API_KEY")
+        url = "https://api.rawg.io/api/games"
+        
+        params = {
+            "key": api_key,
+            "search": query,
+            "page_size": 10,
+        }
+        
+        response = requests.get(url, params=params)
+        
+        if response.status_code == 200:
+            data = response.json()
+            games = data["results"]
+            
+    return render(
+        request,
+        "core/search_games.html",
+        {
+            "query": query,
+            "games": games,
+        },
+    )
+    
+@login_required
+def add_rawg_game(request, rawg_id):
+    if request.method == "POST":
+        api_key = os.getenv("RAWG_API_KEY")
+
+        url = f"https://api.rawg.io/api/games/{rawg_id}"
+
+        params = {
+            "key": api_key,
+        }
+
+        response = requests.get(url, params=params)
+
+        if response.status_code == 200:
+            data = response.json()
+
+            game, created = Game.objects.get_or_create(
+                rawg_id=rawg_id,
+                defaults={
+                    "title": data["name"],
+                    "released": data["released"],
+                    "background_image": data["background_image"],
+                },
+            )
+
+            LibraryEntry.objects.get_or_create(
+                user=request.user,
+                game=game,
+            )
+
+    return redirect("home")
+        

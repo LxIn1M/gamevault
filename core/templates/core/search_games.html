@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Games - LixDex</title>
+</head>
+<body>
+
+    <h1>Search Games</h1>
+
+    <form method="get">
+        <input
+            type="text"
+            name="q"
+            value="{{ query }}"
+            placeholder="Search for a game..."
+        >
+
+        <button type="submit">Search</button>
+    </form>
+
+    {% for game in games %}
+        <hr>
+
+        <h2>{{ game.name }}</h2>
+
+        <p>ID: {{ game.id }}</p>
+        <p>Released: {{ game.released }}</p>
+        <p>Rating: {{ game.rating }}</p>
+
+        {% if game.background_image %}
+            <img
+                src="{{ game.background_image }}"
+                alt="{{ game.name }}"
+                width="300"
+            >
+        {% endif %}
+        <form method="post" action="{% url 'add_rawg_game' game.id %}">
+            {% csrf_token %}
+            <button type="submit">Add to library</button>
+        </form>
+    {% endfor %}
+
+</body>
+</html>

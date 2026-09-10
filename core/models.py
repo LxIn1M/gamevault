@@ -3,8 +3,21 @@ from django.conf import settings
 
 
 class Game(models.Model):
-    title = models.CharField(max_length=100)
-    
+    rawg_id = models.IntegerField(
+        unique=True,
+        null=True,
+        blank=True,
+    )
+    title = models.CharField(max_length=200)
+    released = models.DateField(
+        null=True,
+        blank=True,
+    )
+    background_image = models.URLField(
+        null=True,
+        blank=True,
+    )
+
     def __str__(self):
         return self.title
 
