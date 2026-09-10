@@ -148,15 +148,17 @@ def add_rawg_game(request, rawg_id):
                 rawg_id=rawg_id,
                 defaults={
                     "title": data["name"],
-                    "released": data["released"],
-                    "background_image": data["background_image"],
+                    "released": data.get("released"),
+                    "background_image": data.get("background_image"),
                 },
             )
 
-            LibraryEntry.objects.get_or_create(
+            entry, created = LibraryEntry.objects.get_or_create(
                 user=request.user,
                 game=game,
             )
 
-    return redirect("home")
+            return redirect("edit_entry", entry_id=entry.id)
+
+    return redirect("search_games")
         

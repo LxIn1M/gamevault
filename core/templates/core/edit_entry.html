@@ -6,15 +6,23 @@
 </head>
 
 <body>
-    <h1>Edit {{ entry.game.title }}</h1>
+    <h1>{{ entry.game.title }}</h1>
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
+{% if entry.game.background_image %}
+    <img
+        src="{{ entry.game.background_image }}"
+        alt="{{ entry.game.title }}"
+        width="300"
+    >
+{% endif %}
 
-        <button type="submit">Save changes</button>
-    </form>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
 
-    <a href="{% url 'home' %}">Back</a>
+    <button type="submit">Save</button>
+</form>
+
+<a href="{% url 'home' %}">Back to library</a>
 </body>
 </html>
