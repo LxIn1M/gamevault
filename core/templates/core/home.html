@@ -16,10 +16,16 @@
     {% for entry in entries %}
         {% if entry.status == "completed" %}
             <li>{{ entry.game.title }} | Status: ✅ Completed | Hours: {{ entry.hours }} | Rating: {{ entry.rating }}</li>
+            <a href="{% url 'edit_entry' entry.id %}">Edit</a>
+            <a href="{% url 'delete_entry' entry.id %}">Delete</a>
         {% elif entry.status == "playing" %}
             <li>{{ entry.game.title }} | Status: 🟢 Playing | Hours: {{ entry.hours }} | Rating: {{ entry.rating }}</li>
+            <a href="{% url 'edit_entry' entry.id %}">Edit</a>
+            <a href="{% url 'delete_entry' entry.id %}">Delete</a>
         {% else %}
             <li>{{ entry.game.title }} | Status: {{ entry.get_status_display }} | Hours: {{ entry.hours }} | Rating: {{ entry.rating }}</li>
+            <a href="{% url 'edit_entry' entry.id %}">Edit</a>
+            <a href="{% url 'delete_entry' entry.id %}">Delete</a>
         {% endif %}
     {% endfor %}
     </ul>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Entry - GameVault</title>
+</head>
+
+<body>
+    <h1>Edit {{ entry.game.title }}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit">Save changes</button>
+    </form>
+
+    <a href="{% url 'home' %}">Back</a>
+</body>
+</html>
