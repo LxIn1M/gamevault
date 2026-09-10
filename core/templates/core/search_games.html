@@ -35,10 +35,14 @@
                 width="300"
             >
         {% endif %}
-        <form method="post" action="{% url 'add_rawg_game' game.id %}">
-            {% csrf_token %}
-            <button type="submit">Add to library</button>
-        </form>
+        {% if game.id in library_rawg_ids %}
+            <p>✓ Already in library</p>
+        {% else %}
+            <form method="post" action="{% url 'add_rawg_game' game.id %}">
+                {% csrf_token %}
+                <button type="submit">Add to library</button>
+            </form>
+{% endif %}
     {% endfor %}
 
 </body>

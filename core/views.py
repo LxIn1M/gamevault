@@ -100,31 +100,40 @@ def delete_entry(request, entry_id):
 @login_required
 def search_games(request):
     query = request.GET.get("q", "")
-    
+
     games = []
-    
+
+    library_rawg_ids = set(
+        LibraryEntry.objects.filter(
+            user=request.user,
+            game__rawg_id__isnull=False,
+        ).values_list("game__rawg_id", flat=True)
+    )
+
     if query:
         api_key = os.getenv("RAWG_API_KEY")
+
         url = "https://api.rawg.io/api/games"
-        
+
         params = {
             "key": api_key,
             "search": query,
             "page_size": 10,
         }
-        
+
         response = requests.get(url, params=params)
-        
+
         if response.status_code == 200:
             data = response.json()
-            games = data["results"]
-            
+            games = data.get("results", [])
+
     return render(
         request,
         "core/search_games.html",
         {
             "query": query,
             "games": games,
+            "library_rawg_ids": library_rawg_ids,
         },
     )
     
