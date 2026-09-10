@@ -1,28 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Entry - GameVault</title>
-</head>
+{% extends "core/base.html" %}
 
-<body>
-    <h1>{{ entry.game.title }}</h1>
+{% block title %}
+Edit {{ entry.game.title }} - LixDex
+{% endblock %}
 
-{% if entry.game.background_image %}
-    <img
-        src="{{ entry.game.background_image }}"
-        alt="{{ entry.game.title }}"
-        width="300"
-    >
-{% endif %}
+{% block content %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
+    <div class="form-page">
+        <div class="form-card">
 
-    <button type="submit">Save</button>
-</form>
+            {% if entry.game.background_image %}
+                <img
+                    src="{{ entry.game.background_image }}"
+                    alt="{{ entry.game.title }}"
+                    class="form-cover"
+                >
+            {% endif %}
 
-<a href="{% url 'home' %}">Back to library</a>
-</body>
-</html>
+            <h1>{{ entry.game.title }}</h1>
+            <p>Edit your library information.</p>
+
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+
+                <button type="submit" class="primary-button">
+                    Save changes
+                </button>
+            </form>
+
+            <a href="{% url 'home' %}" class="back-link">
+                ← Back to library
+            </a>
+
+        </div>
+    </div>
+
+{% endblock %}

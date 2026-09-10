@@ -2,8 +2,8 @@ from django.shortcuts import render
 from .models import LibraryEntry, Game
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
-from django.shortcuts import redirect
-from .forms import LibraryEntryForm, LibraryEntryUpdateForm
+from django.shortcuts import redirect, get_object_or_404
+from .forms import LibraryEntryUpdateForm
 import os
 import requests
 from dotenv import load_dotenv
@@ -12,7 +12,9 @@ load_dotenv()
 
 @login_required
 def home(request):
-    entries = LibraryEntry.objects.filter(user=request.user)
+    entries = LibraryEntry.objects.filter(
+        user=request.user
+    ).select_related("game")
 
     context = {
         "username": request.user.username,
@@ -36,27 +38,12 @@ def register(request):
     return render(request, "registration/register.html", {"form": form})
 
 @login_required
-def add_game(request):
-    if request.method == "POST":
-        form = LibraryEntryForm(request.POST)
-
-        if form.is_valid():
-            entry = form.save(commit=False)
-            entry.user = request.user
-            entry.save()
-
-            return redirect("home")
-    else:
-        form = LibraryEntryForm()
-
-    return render(request, "core/add_game.html", {"form": form})
-
-@login_required
 def edit_entry(request, entry_id):
-    entry = LibraryEntry.objects.get(
-        id=entry_id,
-        user=request.user,
-    )
+    entry = get_object_or_404(
+    LibraryEntry,
+    id=entry_id,
+    user=request.user,
+)
 
     if request.method == "POST":
         form = LibraryEntryUpdateForm(
@@ -82,10 +69,11 @@ def edit_entry(request, entry_id):
     
 @login_required
 def delete_entry(request, entry_id):
-    entry = LibraryEntry.objects.get(
-        id=entry_id,
-        user=request.user,
-    )
+    entry = get_object_or_404(
+    LibraryEntry,
+    id=entry_id,
+    user=request.user,
+)
 
     if request.method == "POST":
         entry.delete()

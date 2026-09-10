@@ -1,49 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Search Games - LixDex</title>
-</head>
-<body>
+{% extends "core/base.html" %}
+
+{% block title %}
+Search Games - LixDex
+{% endblock %}
+
+{% block content %}
 
     <h1>Search Games</h1>
+    <p>Find a game and add it to your library.</p>
 
-    <form method="get">
+    <form method="get" class="search-form">
         <input
             type="text"
             name="q"
             value="{{ query }}"
             placeholder="Search for a game..."
         >
-
         <button type="submit">Search</button>
     </form>
 
-    {% for game in games %}
-        <hr>
+    {% if query %}
+        <h2>Results for "{{ query }}"</h2>
+    {% endif %}
 
-        <h2>{{ game.name }}</h2>
+    <div id="search_results">
 
-        <p>ID: {{ game.id }}</p>
-        <p>Released: {{ game.released }}</p>
-        <p>Rating: {{ game.rating }}</p>
+        {% for game in games %}
 
-        {% if game.background_image %}
-            <img
-                src="{{ game.background_image }}"
-                alt="{{ game.name }}"
-                width="300"
-            >
-        {% endif %}
-        {% if game.id in library_rawg_ids %}
-            <p>✓ Already in library</p>
-        {% else %}
-            <form method="post" action="{% url 'add_rawg_game' game.id %}">
-                {% csrf_token %}
-                <button type="submit">Add to library</button>
-            </form>
-{% endif %}
-    {% endfor %}
+            <div class="game-card">
 
-</body>
-</html>
+                {% if game.background_image %}
+                    <img
+                        src="{{ game.background_image }}"
+                        alt="{{ game.name }}"
+                    >
+                {% endif %}
+
+                <div class="game-info">
+
+                    <h2>{{ game.name }}</h2>
+
+                    {% if game.released %}
+                        <p>Released: {{ game.released }}</p>
+                    {% endif %}
+
+                    <p>RAWG Rating: {{ game.rating }}/5</p>
+
+                    {% if game.id in library_rawg_ids %}
+
+                        <p class="in-library">
+                            ✓ Already in library
+                        </p>
+
+                    {% else %}
+
+                        <form
+                            method="post"
+                            action="{% url 'add_rawg_game' game.id %}"
+                        >
+                            {% csrf_token %}
+                            <button type="submit">
+                                Add to library
+                            </button>
+                        </form>
+
+                    {% endif %}
+
+                </div>
+            </div>
+
+        {% empty %}
+
+            {% if query %}
+                <p>No games found.</p>
+            {% endif %}
+
+        {% endfor %}
+
+    </div>
+
+{% endblock %}

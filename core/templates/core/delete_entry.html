@@ -1,14 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Delete Entry - GameVault</title>
-</head>
+{% extends "core/base.html" %}
 
-<body>
+{% block title %}
+Delete Entry - LixDex
+{% endblock %}
+
+{% block content %}
     <h1>Delete {{ entry.game.title }}</h1>
 
-    <p>Are you sure you want to remove this game from your library?</p>
+    <p>
+    Are you sure you want to remove
+    <strong>{{ entry.game.title }}</strong>
+    from your library?
+</p>
 
     <form method="post">
         {% csrf_token %}
@@ -16,5 +19,5 @@
     </form>
 
     <a href="{% url 'home' %}">Cancel</a>
-</body>
-</html>
+
+{% endblock %}

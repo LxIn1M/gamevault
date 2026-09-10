@@ -1,64 +1,68 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>LixDex</title>
-</head>
+{% extends "core/base.html" %}
 
-<body>
-    <h1>LixDex</h1>
+{% block title %}
+Library - LixDex
+{% endblock %}
+
+{% block content %}
+
+    <h1>Your Library</h1>
 
     <p>{{ username }}'s gaming library.</p>
     <p>Added games: {{ games_count }}</p>
 
-    <h2>Library</h2>
-
-    <ul id="games_list">
+    <div id="games_list">
         {% for entry in entries %}
-            <li>
+
+            <div class="game-card">
+
                 {% if entry.game.background_image %}
                     <img
                         src="{{ entry.game.background_image }}"
                         alt="{{ entry.game.title }}"
-                        width="200"
                     >
                 {% endif %}
 
-                <h3>{{ entry.game.title }}</h3>
+                <div class="game-info">
 
-                {% if entry.game.released %}
-                    <p>Released: {{ entry.game.released }}</p>
-                {% endif %}
+                    <h2>{{ entry.game.title }}</h2>
 
-                {% if entry.game.rawg_id %}
-                    <p>RAWG ID: {{ entry.game.rawg_id }}</p>
-                {% endif %}
+                    {% if entry.game.released %}
+                        <p>Released: {{ entry.game.released }}</p>
+                    {% endif %}
 
-                {% if entry.status == "completed" %}
-                    <p>Status: ✅ Completed</p>
-                {% elif entry.status == "playing" %}
-                    <p>Status: 🟢 Playing</p>
-                {% else %}
-                    <p>Status: {{ entry.get_status_display }}</p>
-                {% endif %}
+                    {% if entry.status == "completed" %}
+                        <p>✅ Completed</p>
 
-                <p>Hours: {{ entry.hours }}</p>
-                <p>Rating: {{ entry.rating }}</p>
+                    {% elif entry.status == "playing" %}
+                        <p>🟢 Playing</p>
 
-                <a href="{% url 'edit_entry' entry.id %}">Edit</a>
-                <a href="{% url 'delete_entry' entry.id %}">Delete</a>
-            </li>
+                    {% else %}
+                        <p>{{ entry.get_status_display }}</p>
+                    {% endif %}
+
+                    <p>Hours: {{ entry.hours }}</p>
+
+                    {% if entry.rating %}
+                        <p>Rating: {{ entry.rating }}/10</p>
+                    {% else %}
+                        <p>Rating: Not rated</p>
+                    {% endif %}
+
+                    <a href="{% url 'edit_entry' entry.id %}">
+                        Edit
+                    </a>
+
+                    <a href="{% url 'delete_entry' entry.id %}">
+                        Delete
+                    </a>
+
+                </div>
+            </div>
+
         {% empty %}
-            <li>Your library is empty.</li>
+            <p>Your library is empty.</p>
         {% endfor %}
-    </ul>
+    </div>
 
-    <a href="{% url 'search_games' %}">Search games</a>
-    <a href="{% url 'add_game' %}">Add game</a>
-
-    <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button type="submit">Logout</button>
-    </form>
-</body>
-
+{% endblock %}

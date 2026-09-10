@@ -1,22 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login - GameVault</title>
-</head>
+{% extends "core/base.html" %}
 
-<body>
-    <h1>Login</h1>
+{% block title %}
+Login - LixDex
+{% endblock %}
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
+{% block content %}
 
-        <button type="submit">Login</button>
-    </form>
-    <p>
-    Don't have an account?
-    <a href="{% url 'register' %}">Create account</a>
-</p>
-</body>
-</html>
+    <div class="auth-page">
+        <div class="auth-card">
+
+            <h1>Welcome back</h1>
+            <p>Log in to your LixDex account.</p>
+
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+
+                <button type="submit" class="primary-button">
+                    Login
+                </button>
+            </form>
+
+            <p class="auth-switch">
+                Don't have an account?
+                <a href="{% url 'register' %}">Register</a>
+            </p>
+
+        </div>
+    </div>
+
+{% endblock %}
