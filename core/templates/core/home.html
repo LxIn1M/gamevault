@@ -1,109 +1,361 @@
 {% extends "core/base.html" %}
 
-{% block title %}Your Library - LixDex{% endblock %}
+{% block title %}LixDex — Your Library{% endblock %}
 
 {% block content %}
-<div class="wrap">
 
-    <section class="hero">
-        <div class="hero-grid">
-            <div>
-                <div class="eyebrow-tag reveal">Your gaming library</div>
-                <h1 class="reveal delay-1">Everything you play, organized in one place</h1>
-                <p class="lede reveal delay-2">
-                    Track what you're playing, what you've completed, your hours and personal ratings.
-                </p>
+<section class="hero">
+    <div class="hero-content">
+        <span class="eyebrow">Your personal game library</span>
 
-                <form class="hero-search reveal delay-3" method="get" action="{% url 'search_games' %}">
-                    <div class="search-box">
-                        <input type="text" name="q" placeholder="Search RAWG for a game…">
+        <h1>
+            Track what you play.
+            <span>Remember what you loved.</span>
+        </h1>
+
+        <p>
+            Build your personal gaming library, track your progress,
+            rate games and synchronize your Steam playtime.
+        </p>
+
+        <form
+            method="get"
+            action="{% url 'search_games' %}"
+            class="hero-search"
+        >
+            <input
+                type="text"
+                name="q"
+                placeholder="Search for a game..."
+                autocomplete="off"
+            >
+
+            <button type="submit" class="btn btn-primary">
+                Discover games
+            </button>
+        </form>
+    </div>
+
+    <div class="hero-decoration">
+        <div class="hero-card hero-card-one">
+            <span>🎮</span>
+        </div>
+
+        <div class="hero-card hero-card-two">
+            <span>★</span>
+        </div>
+
+        <div class="hero-card hero-card-three">
+            <span>⏱</span>
+        </div>
+    </div>
+</section>
+
+
+<section class="stats-grid">
+    <article class="stat-card">
+        <span class="stat-label">Games</span>
+
+        <strong>
+            {{ games_count }}
+        </strong>
+
+        <p>in your library</p>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-label">Completed</span>
+
+        <strong>
+            {{ completed_count }}
+        </strong>
+
+        <p>games finished</p>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-label">Overall Hours</span>
+
+        <strong>
+            {{ total_hours|floatformat:1 }}
+        </strong>
+
+        <p>hours played</p>
+    </article>
+</section>
+
+
+<section class="steam-section">
+
+    {% if steam_profile %}
+
+        <div class="steam-panel steam-connected">
+
+            <div class="steam-profile">
+
+                {% if steam_profile.avatar_url %}
+                    <img
+                        src="{{ steam_profile.avatar_url }}"
+                        alt="{{ steam_profile.persona_name }}"
+                        class="steam-avatar"
+                    >
+                {% else %}
+                    <div class="steam-avatar steam-avatar-fallback">
+                        S
                     </div>
-                    <button class="btn-primary" type="submit">Search</button>
-                </form>
+                {% endif %}
 
-                <div class="hero-stats reveal delay-4">
-                    <div class="stat"><b>{{ games_count }}</b><span>games in library</span></div>
-                    <div class="stat"><b>{{ completed_count }}</b><span>completed</span></div>
-                    <div class="stat"><b>{{ total_hours }}</b><span>hours tracked</span></div>
+                <div class="steam-profile-info">
+                    <span class="eyebrow">
+                        Steam connected
+                    </span>
+
+                    <h2>
+                        {{ steam_profile.persona_name }}
+                    </h2>
+
+                    <p>
+                        SteamID:
+                        {{ steam_profile.steam_id }}
+                    </p>
+
+                    {% if steam_profile.last_synced_at %}
+                        <p class="steam-last-sync">
+                            Last synchronized
+                            {{ steam_profile.last_synced_at|date:"d M Y, H:i" }}
+                        </p>
+                    {% else %}
+                        <p class="steam-last-sync">
+                            Library has not been synchronized yet.
+                        </p>
+                    {% endif %}
                 </div>
             </div>
 
-            <div class="feature-panel reveal delay-3">
-                {% if continue_entries %}
-                    {% with featured=continue_entries.0 %}
-                        <a class="feature-cover" href="{% url 'edit_entry' featured.id %}"
-                           {% if featured.game.background_image %}
-                           style="background-image:linear-gradient(180deg, transparent, rgba(0,0,0,.55)), url('{{ featured.game.background_image }}');"
-                           {% endif %}>
-                            {% if not featured.game.background_image %}
-                                <span class="glyph">{{ featured.game.title|slice:":2"|upper }}</span>
-                            {% endif %}
-                        </a>
-                        <div class="feature-meta">
-                            <div>
-                                <h3>{{ featured.game.title }}</h3>
-                                <div class="tags">{{ featured.get_status_display }} · {{ featured.hours }} h</div>
-                            </div>
-                            <div class="rating-pill">
-                                ★ {% if featured.rating is not None %}{{ featured.rating }}{% else %}—{% endif %}
-                            </div>
-                        </div>
-                    {% endwith %}
-                {% else %}
-                    <div class="feature-empty">
-                        <span class="empty-icon">＋</span>
-                        <h3>Start your library</h3>
-                        <p>Add a game from RAWG and start tracking it.</p>
-                        <a class="btn-primary link-button" href="{% url 'search_games' %}">Discover games</a>
-                    </div>
+            <div class="steam-actions">
+
+                {% if steam_profile.profile_url %}
+                    <a
+                        href="{{ steam_profile.profile_url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="btn btn-secondary"
+                    >
+                        View Steam
+                    </a>
                 {% endif %}
+
+                <form
+                    method="post"
+                    action="{% url 'sync_steam' %}"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Sync Steam
+                    </button>
+                </form>
+
+                <form
+                    method="post"
+                    action="{% url 'disconnect_steam' %}"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="btn btn-danger"
+                    >
+                        Disconnect
+                    </button>
+                </form>
+
             </div>
-        </div>
-    </section>
 
-    <div class="filter-bar">
-        <a class="pill {% if not active_status %}active{% endif %}" href="{% url 'home' %}">All</a>
-        <a class="pill {% if active_status == 'playing' %}active{% endif %}" href="?status=playing">Playing</a>
-        <a class="pill {% if active_status == 'backlog' %}active{% endif %}" href="?status=backlog">Backlog</a>
-        <a class="pill {% if active_status == 'completed' %}active{% endif %}" href="?status=completed">Completed</a>
-        <a class="pill {% if active_status == 'dropped' %}active{% endif %}" href="?status=dropped">Dropped</a>
-    </div>
-
-    {% if continue_entries and not active_status %}
-    <section class="shelf">
-        <div class="shelf-head">
-            <h2>Continue playing <span class="count">{{ continue_entries|length }} games</span></h2>
         </div>
 
-        <div class="shelf-track">
-            {% for entry in continue_entries %}
-                {% include "core/partials/game_card.html" with entry=entry %}
-            {% endfor %}
+    {% else %}
+
+        <div class="steam-panel steam-connect">
+
+            <div class="steam-connect-copy">
+
+                <span class="eyebrow">
+                    Steam integration
+                </span>
+
+                <h2>
+                    Connect your Steam library
+                </h2>
+
+                <p>
+                    Import your Steam games automatically and keep your
+                    total playtime synchronized with LixDex.
+                </p>
+
+            </div>
+
+            <form
+                method="post"
+                action="{% url 'connect_steam' %}"
+                class="steam-connect-form"
+            >
+                {% csrf_token %}
+
+                {{ steam_form.steam_id }}
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Connect Steam
+                </button>
+            </form>
+
         </div>
-    </section>
+
     {% endif %}
 
-    <section class="shelf">
-        <div class="shelf-head">
-            <h2>
-                {% if active_status %}{{ active_status|title }}{% else %}Full library{% endif %}
-                <span class="count">{{ entries|length }} games</span>
-            </h2>
+</section>
+
+
+{% if continue_entries %}
+
+<section class="section-block">
+
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Jump back in</span>
+            <h2>Continue Playing</h2>
+        </div>
+    </div>
+
+    <div class="horizontal-shelf">
+
+        {% for entry in continue_entries %}
+            {% include "core/partials/game_card.html" %}
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endif %}
+
+
+<section class="section-block">
+
+    <div class="section-heading library-heading">
+
+        <div>
+            <span class="eyebrow">Your collection</span>
+            <h2>Full Library</h2>
         </div>
 
-        {% if entries %}
-            <div class="grid-view">
-                {% for entry in entries %}
-                    {% include "core/partials/game_card.html" with entry=entry %}
-                {% endfor %}
+        <div class="library-count">
+            {{ games_count }} games
+        </div>
+
+    </div>
+
+
+    <nav class="filter-pills">
+
+        <a
+            href="{% url 'home' %}"
+            class="filter-pill {% if not active_status %}active{% endif %}"
+        >
+            All
+        </a>
+
+        <a
+            href="?status=playing"
+            class="filter-pill {% if active_status == 'playing' %}active{% endif %}"
+        >
+            Playing
+        </a>
+
+        <a
+            href="?status=backlog"
+            class="filter-pill {% if active_status == 'backlog' %}active{% endif %}"
+        >
+            Backlog
+        </a>
+
+        <a
+            href="?status=completed"
+            class="filter-pill {% if active_status == 'completed' %}active{% endif %}"
+        >
+            Completed
+        </a>
+
+        <a
+            href="?status=dropped"
+            class="filter-pill {% if active_status == 'dropped' %}active{% endif %}"
+        >
+            Dropped
+        </a>
+
+    </nav>
+
+
+    {% if entries %}
+
+        <div class="library-grid">
+
+            {% for entry in entries %}
+                {% include "core/partials/game_card.html" %}
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+                🎮
             </div>
-        {% else %}
-            <div class="empty-state">
-                <h2>No games here yet</h2>
-                <p>Add a game or choose a different status filter.</p>
-                <a class="btn-primary link-button" href="{% url 'search_games' %}">Search games</a>
-            </div>
-        {% endif %}
-    </section>
-</div>
+
+            <h3>
+                No games here yet
+            </h3>
+
+            {% if active_status %}
+                <p>
+                    You don't have any games with this status.
+                </p>
+
+                <a
+                    href="{% url 'home' %}"
+                    class="btn btn-secondary"
+                >
+                    View all games
+                </a>
+
+            {% else %}
+
+                <p>
+                    Start building your library by discovering a game
+                    or connecting your Steam account.
+                </p>
+
+                <a
+                    href="{% url 'search_games' %}"
+                    class="btn btn-primary"
+                >
+                    Discover games
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+</section>
+
 {% endblock %}

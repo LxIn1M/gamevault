@@ -1,36 +1,46 @@
 {% extends "core/base.html" %}
 
-{% block title %}Edit {{ entry.game.title }} - LixDex{% endblock %}
+{% block title %}Edit {{ entry.game.title }} — LixDex{% endblock %}
 
 {% block content %}
-<div class="wrap page-section">
-    <div class="editor-layout">
-        <div class="editor-cover">
-            {% if entry.game.background_image %}
-                <img src="{{ entry.game.background_image }}" alt="{{ entry.game.title }}">
-            {% else %}
-                <span class="glyph">{{ entry.game.title|slice:":2"|upper }}</span>
-            {% endif %}
-        </div>
 
-        <div class="form-card">
-            <span class="eyebrow-tag">Library entry</span>
-            <h1>{{ entry.game.title }}</h1>
-            {% if entry.game.released %}
-                <p class="muted">Released {{ entry.game.released }}</p>
-            {% endif %}
+<div class="form-page edit-card">
 
-            <form method="post" class="stack-form">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn-primary form-submit">Save changes</button>
-            </form>
+    <div class="edit-entry-header">
+        <span class="eyebrow">Library entry</span>
 
-            <div class="form-links">
-                <a href="{% url 'home' %}">← Back to library</a>
-                <a class="danger-link" href="{% url 'delete_entry' entry.id %}">Remove game</a>
-            </div>
-        </div>
+        <h1>Edit game</h1>
+
+        <p>
+            Editing
+            <span class="edit-game-name">
+                {{ entry.game.title }}
+            </span>
+        </p>
     </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <div class="edit-actions">
+            <a
+                href="{% url 'home' %}"
+                class="btn btn-secondary"
+            >
+                Cancel
+            </a>
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Save changes
+            </button>
+        </div>
+    </form>
+
 </div>
+
 {% endblock %}

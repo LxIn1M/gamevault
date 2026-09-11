@@ -12,61 +12,111 @@
 </head>
 <body>
 
-<header>
-    <div class="header-row">
-        <a class="logo" href="{% url 'home' %}">
-            <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
-                <rect x="2" y="6" width="22" height="16" rx="5" stroke="var(--accent)" stroke-width="2"/>
-                <circle cx="9" cy="14" r="1.6" fill="var(--accent)"/>
-                <circle cx="13" cy="11.5" r="1.6" fill="var(--accent)"/>
-                <circle cx="17" cy="14" r="1.6" fill="var(--accent)"/>
-            </svg>
-            LixDex
-        </a>
+<header class="site-header">
+    <div class="header-inner">
 
-        {% if user.is_authenticated %}
-            <nav class="primary-nav">
-                <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Library</a>
-                <a href="{% url 'search_games' %}" class="{% if request.resolver_match.url_name == 'search_games' %}active{% endif %}">Discover</a>
+        <div class="header-left">
+
+            <a href="{% url 'home' %}" class="brand">
+                <span class="brand-mark">
+                    LD
+                </span>
+
+                <span>
+                    LixDex
+                </span>
+            </a>
+
+            <nav class="main-nav">
+
+                <a href="{% url 'home' %}">
+                    Library
+                </a>
+
+                <a href="{% url 'search_games' %}">
+                    Discover
+                </a>
+
             </nav>
 
-            <form class="search-box header-search" method="get" action="{% url 'search_games' %}">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="7"/>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
-                <input type="text" name="q" placeholder="Search games…" value="{{ query|default:'' }}">
-            </form>
+        </div>
 
-            <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme" type="button">
-                <svg id="theme-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="4.4"></circle>
-                    <line x1="12" y1="1.5" x2="12" y2="3.6"></line>
-                    <line x1="12" y1="20.4" x2="12" y2="22.5"></line>
-                    <line x1="4.2" y1="4.2" x2="5.7" y2="5.7"></line>
-                    <line x1="18.3" y1="18.3" x2="19.8" y2="19.8"></line>
-                    <line x1="1.5" y1="12" x2="3.6" y2="12"></line>
-                    <line x1="20.4" y1="12" x2="22.5" y2="12"></line>
-                    <line x1="4.2" y1="19.8" x2="5.7" y2="18.3"></line>
-                    <line x1="18.3" y1="5.7" x2="19.8" y2="4.2"></line>
-                </svg>
-            </button>
 
-            <div class="avatar" title="{{ user.username }}">{{ user.username|first|upper }}</div>
+        <div class="header-actions">
 
-            <form method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button class="ghost-button" type="submit">Logout</button>
-            </form>
-        {% else %}
-            <nav class="primary-nav auth-nav">
-                <a href="{% url 'login' %}">Login</a>
-                <a href="{% url 'register' %}">Register</a>
-            </nav>
-            <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme" type="button">◐</button>
-        {% endif %}
+            {% if user.is_authenticated %}
+
+                <form
+                    method="get"
+                    action="{% url 'search_games' %}"
+                    class="header-search"
+                >
+                    <input
+                        type="text"
+                        name="q"
+                        placeholder="Search games..."
+                    >
+                </form>
+
+
+                <button
+                    type="button"
+                    class="theme-toggle"
+                    id="theme-toggle"
+                >
+                    ☼
+                </button>
+
+
+                <div class="user-avatar">
+                    {{ user.username|first }}
+                </div>
+
+
+                <form
+                    method="post"
+                    action="{% url 'logout' %}"
+                    class="logout-form"
+                >
+                    {% csrf_token %}
+
+                    <button type="submit">
+                        Logout
+                    </button>
+                </form>
+
+            {% else %}
+
+                <a
+                    href="{% url 'login' %}"
+                    class="btn btn-secondary"
+                >
+                    Login
+                </a>
+
+                <a
+                    href="{% url 'register' %}"
+                    class="btn btn-primary"
+                >
+                    Register
+                </a>
+
+            {% endif %}
+
+        </div>
+
     </div>
 </header>
+
+{% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
 
 <main>
     {% block content %}{% endblock %}
