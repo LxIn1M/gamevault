@@ -1,0 +1,23 @@
+<article class="card">
+    <a class="cover" href="{% url 'edit_entry' entry.id %}">
+        {% if entry.game.background_image %}
+            <img src="{{ entry.game.background_image }}" alt="{{ entry.game.title }}" loading="lazy">
+        {% else %}
+            <span class="glyph">{{ entry.game.title|slice:":2"|upper }}</span>
+        {% endif %}
+        <span class="status-badge status-{{ entry.status }}">{{ entry.get_status_display }}</span>
+    </a>
+
+    <div class="info">
+        <h4 title="{{ entry.game.title }}">{{ entry.game.title }}</h4>
+        <div class="meta">
+            <span>{{ entry.hours }} h</span>
+            <span class="dot"></span>
+            <span>★ {% if entry.rating is not None %}{{ entry.rating }}/10{% else %}—{% endif %}</span>
+        </div>
+        <div class="card-actions">
+            <a href="{% url 'edit_entry' entry.id %}">Edit</a>
+            <a class="danger-link" href="{% url 'delete_entry' entry.id %}">Remove</a>
+        </div>
+    </div>
+</article>

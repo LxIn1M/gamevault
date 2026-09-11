@@ -1,37 +1,85 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>{% block title %}LixDex{% endblock %}</title>
 
-    {% load static %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
 </head>
-
 <body>
 
-    <nav>
-        <a href="{% url 'home' %}">LixDex</a>
+<header>
+    <div class="header-row">
+        <a class="logo" href="{% url 'home' %}">
+            <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+                <rect x="2" y="6" width="22" height="16" rx="5" stroke="var(--accent)" stroke-width="2"/>
+                <circle cx="9" cy="14" r="1.6" fill="var(--accent)"/>
+                <circle cx="13" cy="11.5" r="1.6" fill="var(--accent)"/>
+                <circle cx="17" cy="14" r="1.6" fill="var(--accent)"/>
+            </svg>
+            LixDex
+        </a>
 
         {% if user.is_authenticated %}
-            <a href="{% url 'home' %}">Library</a>
-            <a href="{% url 'search_games' %}">Search</a>
+            <nav class="primary-nav">
+                <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Library</a>
+                <a href="{% url 'search_games' %}" class="{% if request.resolver_match.url_name == 'search_games' %}active{% endif %}">Discover</a>
+            </nav>
 
-            <span>{{ user.username }}</span>
+            <form class="search-box header-search" method="get" action="{% url 'search_games' %}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="7"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" name="q" placeholder="Search games…" value="{{ query|default:'' }}">
+            </form>
+
+            <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme" type="button">
+                <svg id="theme-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="4.4"></circle>
+                    <line x1="12" y1="1.5" x2="12" y2="3.6"></line>
+                    <line x1="12" y1="20.4" x2="12" y2="22.5"></line>
+                    <line x1="4.2" y1="4.2" x2="5.7" y2="5.7"></line>
+                    <line x1="18.3" y1="18.3" x2="19.8" y2="19.8"></line>
+                    <line x1="1.5" y1="12" x2="3.6" y2="12"></line>
+                    <line x1="20.4" y1="12" x2="22.5" y2="12"></line>
+                    <line x1="4.2" y1="19.8" x2="5.7" y2="18.3"></line>
+                    <line x1="18.3" y1="5.7" x2="19.8" y2="4.2"></line>
+                </svg>
+            </button>
+
+            <div class="avatar" title="{{ user.username }}">{{ user.username|first|upper }}</div>
 
             <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
-                <button type="submit">Logout</button>
+                <button class="ghost-button" type="submit">Logout</button>
             </form>
+        {% else %}
+            <nav class="primary-nav auth-nav">
+                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'register' %}">Register</a>
+            </nav>
+            <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme" type="button">◐</button>
         {% endif %}
-    </nav>
+    </div>
+</header>
 
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
+<main>
+    {% block content %}{% endblock %}
+</main>
 
+<footer>
+    <div class="wrap footer-row">
+        <span>LixDex — your personal gaming library</span>
+        <span>Game data powered by RAWG</span>
+    </div>
+</footer>
+
+<script src="{% static 'core/js/app.js' %}"></script>
+{% block scripts %}{% endblock %}
 </body>
 </html>

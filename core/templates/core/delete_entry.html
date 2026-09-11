@@ -1,23 +1,19 @@
 {% extends "core/base.html" %}
 
-{% block title %}
-Delete Entry - LixDex
-{% endblock %}
+{% block title %}Remove {{ entry.game.title }} - LixDex{% endblock %}
 
 {% block content %}
-    <h1>Delete {{ entry.game.title }}</h1>
+<div class="wrap page-section">
+    <div class="center-card danger-card">
+        <span class="eyebrow-tag danger-tag">Remove game</span>
+        <h1>Remove {{ entry.game.title }}?</h1>
+        <p>This removes it from your library. The shared game record can remain in the database for other users.</p>
 
-    <p>
-    Are you sure you want to remove
-    <strong>{{ entry.game.title }}</strong>
-    from your library?
-</p>
-
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Delete</button>
-    </form>
-
-    <a href="{% url 'home' %}">Cancel</a>
-
+        <form method="post" class="confirm-actions">
+            {% csrf_token %}
+            <a class="secondary-button" href="{% url 'home' %}">Cancel</a>
+            <button class="danger-button" type="submit">Remove from library</button>
+        </form>
+    </div>
+</div>
 {% endblock %}

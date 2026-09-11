@@ -1,39 +1,36 @@
 {% extends "core/base.html" %}
 
-{% block title %}
-Edit {{ entry.game.title }} - LixDex
-{% endblock %}
+{% block title %}Edit {{ entry.game.title }} - LixDex{% endblock %}
 
 {% block content %}
-
-    <div class="form-page">
-        <div class="form-card">
-
+<div class="wrap page-section">
+    <div class="editor-layout">
+        <div class="editor-cover">
             {% if entry.game.background_image %}
-                <img
-                    src="{{ entry.game.background_image }}"
-                    alt="{{ entry.game.title }}"
-                    class="form-cover"
-                >
+                <img src="{{ entry.game.background_image }}" alt="{{ entry.game.title }}">
+            {% else %}
+                <span class="glyph">{{ entry.game.title|slice:":2"|upper }}</span>
+            {% endif %}
+        </div>
+
+        <div class="form-card">
+            <span class="eyebrow-tag">Library entry</span>
+            <h1>{{ entry.game.title }}</h1>
+            {% if entry.game.released %}
+                <p class="muted">Released {{ entry.game.released }}</p>
             {% endif %}
 
-            <h1>{{ entry.game.title }}</h1>
-            <p>Edit your library information.</p>
-
-            <form method="post">
+            <form method="post" class="stack-form">
                 {% csrf_token %}
                 {{ form.as_p }}
-
-                <button type="submit" class="primary-button">
-                    Save changes
-                </button>
+                <button type="submit" class="btn-primary form-submit">Save changes</button>
             </form>
 
-            <a href="{% url 'home' %}" class="back-link">
-                ← Back to library
-            </a>
-
+            <div class="form-links">
+                <a href="{% url 'home' %}">← Back to library</a>
+                <a class="danger-link" href="{% url 'delete_entry' entry.id %}">Remove game</a>
+            </div>
         </div>
     </div>
-
+</div>
 {% endblock %}

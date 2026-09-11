@@ -1,32 +1,21 @@
 {% extends "core/base.html" %}
 
-{% block title %}
-Register - LixDex
-{% endblock %}
+{% block title %}Register - LixDex{% endblock %}
 
 {% block content %}
+<div class="auth-page wrap">
+    <div class="auth-card">
+        <span class="eyebrow-tag">Create account</span>
+        <h1>Start your LixDex</h1>
+        <p class="muted">Create an account and build your own gaming library.</p>
 
-    <div class="auth-page">
-        <div class="auth-card">
+        <form method="post" class="stack-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn-primary form-submit">Register</button>
+        </form>
 
-            <h1>Create account</h1>
-            <p>Start building your gaming library.</p>
-
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-
-                <button type="submit" class="primary-button">
-                    Register
-                </button>
-            </form>
-
-            <p class="auth-switch">
-                Already have an account?
-                <a href="{% url 'login' %}">Login</a>
-            </p>
-
-        </div>
+        <p class="auth-switch">Already registered? <a href="{% url 'login' %}">Login</a></p>
     </div>
-
+</div>
 {% endblock %}

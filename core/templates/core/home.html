@@ -1,68 +1,109 @@
 {% extends "core/base.html" %}
 
-{% block title %}
-Library - LixDex
-{% endblock %}
+{% block title %}Your Library - LixDex{% endblock %}
 
 {% block content %}
+<div class="wrap">
 
-    <h1>Your Library</h1>
+    <section class="hero">
+        <div class="hero-grid">
+            <div>
+                <div class="eyebrow-tag reveal">Your gaming library</div>
+                <h1 class="reveal delay-1">Everything you play, organized in one place</h1>
+                <p class="lede reveal delay-2">
+                    Track what you're playing, what you've completed, your hours and personal ratings.
+                </p>
 
-    <p>{{ username }}'s gaming library.</p>
-    <p>Added games: {{ games_count }}</p>
+                <form class="hero-search reveal delay-3" method="get" action="{% url 'search_games' %}">
+                    <div class="search-box">
+                        <input type="text" name="q" placeholder="Search RAWG for a game…">
+                    </div>
+                    <button class="btn-primary" type="submit">Search</button>
+                </form>
 
-    <div id="games_list">
-        {% for entry in entries %}
-
-            <div class="game-card">
-
-                {% if entry.game.background_image %}
-                    <img
-                        src="{{ entry.game.background_image }}"
-                        alt="{{ entry.game.title }}"
-                    >
-                {% endif %}
-
-                <div class="game-info">
-
-                    <h2>{{ entry.game.title }}</h2>
-
-                    {% if entry.game.released %}
-                        <p>Released: {{ entry.game.released }}</p>
-                    {% endif %}
-
-                    {% if entry.status == "completed" %}
-                        <p>✅ Completed</p>
-
-                    {% elif entry.status == "playing" %}
-                        <p>🟢 Playing</p>
-
-                    {% else %}
-                        <p>{{ entry.get_status_display }}</p>
-                    {% endif %}
-
-                    <p>Hours: {{ entry.hours }}</p>
-
-                    {% if entry.rating %}
-                        <p>Rating: {{ entry.rating }}/10</p>
-                    {% else %}
-                        <p>Rating: Not rated</p>
-                    {% endif %}
-
-                    <a href="{% url 'edit_entry' entry.id %}">
-                        Edit
-                    </a>
-
-                    <a href="{% url 'delete_entry' entry.id %}">
-                        Delete
-                    </a>
-
+                <div class="hero-stats reveal delay-4">
+                    <div class="stat"><b>{{ games_count }}</b><span>games in library</span></div>
+                    <div class="stat"><b>{{ completed_count }}</b><span>completed</span></div>
+                    <div class="stat"><b>{{ total_hours }}</b><span>hours tracked</span></div>
                 </div>
             </div>
 
-        {% empty %}
-            <p>Your library is empty.</p>
-        {% endfor %}
+            <div class="feature-panel reveal delay-3">
+                {% if continue_entries %}
+                    {% with featured=continue_entries.0 %}
+                        <a class="feature-cover" href="{% url 'edit_entry' featured.id %}"
+                           {% if featured.game.background_image %}
+                           style="background-image:linear-gradient(180deg, transparent, rgba(0,0,0,.55)), url('{{ featured.game.background_image }}');"
+                           {% endif %}>
+                            {% if not featured.game.background_image %}
+                                <span class="glyph">{{ featured.game.title|slice:":2"|upper }}</span>
+                            {% endif %}
+                        </a>
+                        <div class="feature-meta">
+                            <div>
+                                <h3>{{ featured.game.title }}</h3>
+                                <div class="tags">{{ featured.get_status_display }} · {{ featured.hours }} h</div>
+                            </div>
+                            <div class="rating-pill">
+                                ★ {% if featured.rating is not None %}{{ featured.rating }}{% else %}—{% endif %}
+                            </div>
+                        </div>
+                    {% endwith %}
+                {% else %}
+                    <div class="feature-empty">
+                        <span class="empty-icon">＋</span>
+                        <h3>Start your library</h3>
+                        <p>Add a game from RAWG and start tracking it.</p>
+                        <a class="btn-primary link-button" href="{% url 'search_games' %}">Discover games</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <div class="filter-bar">
+        <a class="pill {% if not active_status %}active{% endif %}" href="{% url 'home' %}">All</a>
+        <a class="pill {% if active_status == 'playing' %}active{% endif %}" href="?status=playing">Playing</a>
+        <a class="pill {% if active_status == 'backlog' %}active{% endif %}" href="?status=backlog">Backlog</a>
+        <a class="pill {% if active_status == 'completed' %}active{% endif %}" href="?status=completed">Completed</a>
+        <a class="pill {% if active_status == 'dropped' %}active{% endif %}" href="?status=dropped">Dropped</a>
     </div>
 
+    {% if continue_entries and not active_status %}
+    <section class="shelf">
+        <div class="shelf-head">
+            <h2>Continue playing <span class="count">{{ continue_entries|length }} games</span></h2>
+        </div>
+
+        <div class="shelf-track">
+            {% for entry in continue_entries %}
+                {% include "core/partials/game_card.html" with entry=entry %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="shelf">
+        <div class="shelf-head">
+            <h2>
+                {% if active_status %}{{ active_status|title }}{% else %}Full library{% endif %}
+                <span class="count">{{ entries|length }} games</span>
+            </h2>
+        </div>
+
+        {% if entries %}
+            <div class="grid-view">
+                {% for entry in entries %}
+                    {% include "core/partials/game_card.html" with entry=entry %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h2>No games here yet</h2>
+                <p>Add a game or choose a different status filter.</p>
+                <a class="btn-primary link-button" href="{% url 'search_games' %}">Search games</a>
+            </div>
+        {% endif %}
+    </section>
+</div>
 {% endblock %}
